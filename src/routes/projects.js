@@ -15,13 +15,12 @@ router.get('/', async (req, res) => {
 
 // Create a new project
 router.post('/', async (req, res) => {
-  const { projectID, projectNumber, projectName, customerName } = req.body;
+  const { jobNumber, customer, panels } = req.body;
 
   const project = new Project({
-    projectID,
-    projectNumber,
-    projectName,
-    customerName,
+    jobNumber,
+    customer,
+    panels
   });
 
   try {
@@ -48,17 +47,16 @@ router.get('/:id', async (req, res) => {
 // Update a project by ID
 router.put('/:id', async (req, res) => {
   try {
-    const { projectID, projectNumber, projectName, customerName } = req.body;
+    const { jobNumber, customer, panels } = req.body;
 
     const project = await Project.findById(req.params.id);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
 
-    project.projectID = projectID || project.projectID;
-    project.projectNumber = projectNumber || project.projectNumber;
-    project.projectName = projectName || project.projectName;
-    project.customerName = customerName || project.customerName;
+    project.jobNumber = jobNumber || project.jobNumber;
+    project.customer = customer || project.customer;
+    project.panels = panels || project.panels;
 
     const updatedProject = await project.save();
     res.json(updatedProject);
