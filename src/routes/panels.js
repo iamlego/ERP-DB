@@ -1,3 +1,4 @@
+
 // src/routes/panels.js
 const express = require('express');
 const Panel = require('../models/panel');
@@ -6,7 +7,13 @@ const router = express.Router();
 // Get all panels
 router.get('/', async (req, res) => {
   try {
-    const panels = await Panel.find().populate('bomID');
+    const panels = await Panel.find().populate({
+      path: 'bomID',
+      populate: {
+        path: 'parts',
+        model: 'Part'
+      }
+    });
     res.json(panels);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -15,21 +22,26 @@ router.get('/', async (req, res) => {
 
 // Create a new panel
 router.post('/', async (req, res) => {
-  const { panelID, panelName, panelLocation, panelHours, productNumber, bomID, submittalNumber } = req.body;
+  const { panelID, projectNumber, panelName, bomID, submittalNumber } = req.body;
 
   const panel = new Panel({
     panelID,
+    projectNumber,
     panelName,
-    panelLocation,
-    panelHours,
-    productNumber,
     bomID,
-    submittalNumber,
+    submittalNumber
   });
 
   try {
     const newPanel = await panel.save();
-    res.status(201).json(newPanel);
+    const populatedPanel = await newPanel.populate({
+      path: 'bomID',
+      populate: {
+        path: 'parts',
+        model: 'Part'
+      }
+    });
+    res.status(201).json(populatedPanel);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -38,7 +50,13 @@ router.post('/', async (req, res) => {
 // Get a single panel by ID
 router.get('/:id', async (req, res) => {
   try {
-    const panel = await Panel.findById(req.params.id).populate('bomID');
+    const panel = await Panel.findById(req.params.id).populate({
+      path: 'bomID',
+      populate: {
+        path: 'parts',
+        model: 'Part'
+      }
+    });
     if (!panel) {
       return res.status(404).json({ message: 'Panel not found' });
     }
@@ -51,7 +69,7 @@ router.get('/:id', async (req, res) => {
 // Update a panel by ID
 router.put('/:id', async (req, res) => {
   try {
-    const { panelID, panelName, panelLocation, panelHours, productNumber, bomID, submittalNumber } = req.body;
+    const { panelID, projectNumber, panelName, bomID, submittalNumber } = req.body;
 
     const panel = await Panel.findById(req.params.id);
     if (!panel) {
@@ -59,15 +77,20 @@ router.put('/:id', async (req, res) => {
     }
 
     panel.panelID = panelID || panel.panelID;
+    panel.projectNumber = projectNumber || panel.projectNumber;
     panel.panelName = panelName || panel.panelName;
-    panel.panelLocation = panelLocation || panel.panelLocation;
-    panel.panelHours = panelHours || panel.panelHours;
-    panel.productNumber = productNumber || panel.productNumber;
     panel.bomID = bomID || panel.bomID;
     panel.submittalNumber = submittalNumber || panel.submittalNumber;
 
     const updatedPanel = await panel.save();
-    res.json(updatedPanel);
+    const populatedPanel = await updatedPanel.populate({
+      path: 'bomID',
+      populate: {
+        path: 'parts',
+        model: 'Part'
+      }
+    });
+    res.json(populatedPanel);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -80,7 +103,6 @@ router.delete('/:id', async (req, res) => {
     if (!panel) {
       return res.status(404).json({ message: 'Panel not found' });
     }
-
     await panel.remove();
     res.json({ message: 'Panel deleted' });
   } catch (error) {
