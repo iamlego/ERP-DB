@@ -2,23 +2,9 @@
 const mongoose = require('mongoose');
 
 const projectSchema = new mongoose.Schema({
-  jobNumber: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  customer: {
-    type: String,
-    required: true,
-  },
-  panels: {
-    type: [String], // Assuming panels are identified by some unique identifier
-    default: [],
-  },
-  instruments: {
-    type: [String], // Assuming instruments are identified by some unique identifier
-    default: [],
-  },
+  jobNumber: {type: String, required: true, unique: true,},
+  customer:  { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
+  panels: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Panel' }]
 }, {
   timestamps: true,
 });
