@@ -15,26 +15,3 @@ app.listen(PORT, () => {
 });
 
 
-// const express = require('express');
-// const DB = require('./config/db'); 
-// const dotenv = require('dotenv');
-
-// dotenv.config();
-
-// const app = express();
-// const db = new DB();
-
-// db.connectDB();
-
-// const port = db.port;
-
-// const server = app.listen(port, () => {
-//   console.log(`Server is running on port ${port}`);
-// });
-
-// // Handle shutdown
-// process.on('SIGTERM', () => { 
-//   server.close(() => {
-//     console.log('Process terminated');
-//   });
-// });
