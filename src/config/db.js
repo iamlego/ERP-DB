@@ -1,8 +1,16 @@
 // const mongoose = require('mongoose');
+const { MongoClient } = require("mongodb");
 const dotenv = require('dotenv');
 
 dotenv.config();
-console.log(process.env.MONGO_URI);
+
+const uri = process.env.MONGO_URI
+const client = new MongoClient(uri);
+
+async function connectToDB(){
+  await client.connect();
+}
+
 class DB {
   
   port = process.env.PORT;
@@ -22,7 +30,7 @@ class DB {
 const ins = new DB();
 ins.connectDB();
 
-module.exports = DB;
+module.exports = connectToDB;
 
 
 
